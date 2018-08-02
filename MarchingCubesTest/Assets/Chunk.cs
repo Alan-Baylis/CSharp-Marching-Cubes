@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Chunk : MonoBehaviour {
@@ -81,6 +82,8 @@ public class Chunk : MonoBehaviour {
 	}
 
 	void Start () {
+
+        
 
 		gameObject.AddComponent<MeshCollider>();
         voxels = new Voxel[chunkSize - 1, chunkSize - 1, chunkSize - 1];
@@ -187,7 +190,7 @@ public class Chunk : MonoBehaviour {
 
         mesh = new Mesh();
 
-        mesh.vertices = verts.ToArray();
+        mesh.SetVertices(verts);
 		mesh.triangles = tris;
 
 		mesh.RecalculateNormals();

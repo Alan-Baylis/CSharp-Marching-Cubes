@@ -48,18 +48,12 @@ public class Voxel {
 
 		for(int i = 0; i<triCount; i++){
             AddVerts(verts, i);
-
-
-            
         }	
 	}
 
     void AddVerts(List<Vector3> verts, int i)
     {
-        Vector3[] ps = triangles[i].points;
-
-        verts.AddRange(ps);
-        
+        verts.AddRange(triangles[i].points);
 
         chunk.j += 3;
 
