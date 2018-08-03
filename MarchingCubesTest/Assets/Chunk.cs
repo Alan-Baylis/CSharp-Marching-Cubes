@@ -16,6 +16,7 @@ public class Chunk : MonoBehaviour {
 	public bool interpolate;
 
 	public float[,,] densities;
+    public bool[,,] densitiesCreated;
 
 	[Range(0f,1f)]
 	public float iso = 0.5f;	
@@ -26,7 +27,6 @@ public class Chunk : MonoBehaviour {
 
 	public bool add = true;
 
-	private bool created = false;
     private bool voxelsCreated = false;
 
     public Voxel[,,] voxels;
@@ -36,13 +36,10 @@ public class Chunk : MonoBehaviour {
 
 	public float GetDensity(float x, float y, float z){
 
-		if(created)
+		if(densitiesCreated[(int)x,(int)y,(int)z])
 			return densities[(int)x,(int)y,(int)z];
-
-		if(x == chunkSize-1 && y == chunkSize-1 && z == chunkSize-1)
-			created = true;
-
-		return CalculateDensity(x,y,z);
+        else
+		    return CalculateDensity(x,y,z);
 
  		
 
@@ -50,6 +47,8 @@ public class Chunk : MonoBehaviour {
 
     public float CalculateDensity(float x, float y, float z)
     {
+        densitiesCreated[(int)x, (int)y, (int)z] = true;
+
         return -1 * x * y * z + 30;
     }
 
@@ -80,6 +79,9 @@ public class Chunk : MonoBehaviour {
 
 	void Awake(){
 		densities = new float[chunkSize, chunkSize, chunkSize];
+        densitiesCreated = new bool[chunkSize, chunkSize, chunkSize];
+
+        mesh = new Mesh();
 
 		meshFilter = GetComponent<MeshFilter>();
 	}
