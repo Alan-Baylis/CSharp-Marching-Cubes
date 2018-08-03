@@ -109,6 +109,10 @@ public class Chunk : MonoBehaviour {
     void ModifyTerrain(Vector3 p, bool build, float force)
     {
 
+        if (force <= 0)
+            return;
+
+
         //Calculate modification range
         int range = Mathf.CeilToInt(force / 2f);
 
