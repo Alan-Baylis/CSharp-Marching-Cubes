@@ -39,21 +39,21 @@ public static class MarchingCubes {
             if (triangles[i].points == null)
                 triangles[i].points = new Vector3[3];
 
-            triangles[i].points[0] = vertlist[LookupTables.triTable[cubeindex, i]];
-            triangles[i].points[1] = vertlist[LookupTables.triTable[cubeindex, i + 1]];
-            triangles[i].points[2] = vertlist[LookupTables.triTable[cubeindex, i + 2]];
+            SetTriangleVertices(triangles[i], vertlist, cubeindex, i*3);
 		}
         
 
 		return 0;
 	}
 
-    public static Vector3[] SetTriangleVertices(Vector3[] vertlist, int cubeindex, int i)
+    public static void SetTriangleVertices(Triangle triangle, Vector3[] vertlist, int cubeindex, int i)
     {
-        return new Vector3[3] { vertlist[LookupTables.triTable[cubeindex, i]], vertlist[LookupTables.triTable[cubeindex, i + 1]], vertlist[LookupTables.triTable[cubeindex, i + 2]] };
+        triangle.points[0] = vertlist[LookupTables.triTable[cubeindex, i]];
+        triangle.points[1] = vertlist[LookupTables.triTable[cubeindex, i + 1]];
+        triangle.points[2] = vertlist[LookupTables.triTable[cubeindex, i + 2]];
     }
 
-    public static void GenerateVertlist(ref Vector3[] vertlist, int edgeindex, float isolevel, Vector3[] corners, float[] densities, bool interpolate){
+    public static void GenerateVertlist(ref Vector3[] vertlist, int edgeindex, float isolevel, Vector3Int[] corners, float[] densities, bool interpolate){
 
 		
 
@@ -162,10 +162,10 @@ public struct Triangle
 
 public struct GridCell
 {
-    public Vector3[] corners;
+    public Vector3Int[] corners;
     public float[] densities;
 
-    public GridCell(Vector3[] corners, float[] densities)
+    public GridCell(Vector3Int[] corners, float[] densities)
     {
         this.corners = corners;
         this.densities = densities;

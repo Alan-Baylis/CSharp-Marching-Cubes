@@ -10,7 +10,7 @@ public class Voxel {
 
 	public Chunk chunk;
 
-	public Vector3[] corners;
+	public Vector3Int[] corners;
 
 	public float[] densities;
 
@@ -63,13 +63,11 @@ public class Voxel {
         chunk.j += 3;
     }
 
-	public float[] GenerateDensities(Vector3[] corners){
+	public float[] GenerateDensities(Vector3Int[] corners){
 
 		if(densitiesCreated){
 			for(int i = 0; i<corners.Length; i++){
 				densities[i] = chunk.GetDensity(corners[i].x, corners[i].y, corners[i].z);
-				// chunk.densities[(int)corners[i].z, (int)corners[i].y, (int)corners[i].x] = densities[i];
-
 			}
 			return densities;
 
@@ -80,7 +78,7 @@ public class Voxel {
 			for(int i = 0; i<corners.Length; i++){
                 float density = chunk.GetDensity(corners[i].x, corners[i].y, corners[i].z);
                 densities[i] = density;
-				chunk.densities[(int)corners[i].x, (int)corners[i].y, (int)corners[i].z] = density;
+				chunk.densities[corners[i].x, corners[i].y, corners[i].z] = density;
 			}
 			densitiesCreated = true;
 			return densities;
@@ -89,17 +87,17 @@ public class Voxel {
 
 	public void GenerateCorners(){
 
-        corners = new Vector3[8];
+        corners = new Vector3Int[8];
 
-		corners[0] = new Vector3(x		,y		,z	);
-		corners[1] = new Vector3(x+1f	,y		,z	);
-		corners[2] = new Vector3(x+1f	,y		,z+1f);
-		corners[3] = new Vector3(x		,y		,z+1f);
-
-		corners[4] = new Vector3(x		,y+1f	,z	);
-		corners[5] = new Vector3(x+1f	,y+1f	,z	);
-		corners[6] = new Vector3(x+1f	,y+1f	,z+1f);
-		corners[7] = new Vector3(x		,y+1f	,z+1f);
+		corners[0] = new Vector3Int(x		,y		,z	);
+		corners[1] = new Vector3Int(x+1	,y		,z	);
+		corners[2] = new Vector3Int(x+1	,y		,z+1);
+		corners[3] = new Vector3Int(x		,y		,z+1);
+                         
+		corners[4] = new Vector3Int(x		,y+1	,z	);
+		corners[5] = new Vector3Int(x+1	,y+1	,z	);
+		corners[6] = new Vector3Int(x+1	,y+1	,z+1);
+		corners[7] = new Vector3Int(x		,y+1	,z+1);
 
         cornersCreated = true;
 

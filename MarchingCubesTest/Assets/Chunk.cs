@@ -171,17 +171,11 @@ public class Chunk : MonoBehaviour {
 			for(int y = 0; y<chunkSize-1; y++){
 				for(int z = 0; z<chunkSize-1; z++){
 
-                    Voxel voxel;
 
                     if (!voxelsCreated)
-                    {
-                        voxel = new Voxel(x, y, z, this);
-                        voxels[x, y, z] = voxel;
-                    }
-                    else
-                        voxel = voxels[x, y, z];
+                        voxels[x, y, z] = new Voxel(x, y, z, this);
 
-					voxel.March(iso, chunkSize, interpolate, verts);
+					voxels[x,y,z].March(iso, chunkSize, interpolate, verts);
 
 
 				}
