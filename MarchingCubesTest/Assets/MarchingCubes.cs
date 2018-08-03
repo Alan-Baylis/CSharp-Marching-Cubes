@@ -8,7 +8,7 @@ public static class MarchingCubes {
 
         int cubeindex = GenerateCubeindex(cell.densities, isolevel);
 
-		int edgeindex = LookupTables.edgeTable[cubeindex];
+        int edgeindex = GetEdgeIndex(cubeindex);
 
 		if(edgeindex == 0)
 			return 0;
@@ -20,6 +20,11 @@ public static class MarchingCubes {
 
 
 	}
+
+    public static int GetEdgeIndex(int cubeindex)
+    {
+        return LookupTables.edgeTable[cubeindex];
+    }
 
 	public static int GenerateTriangles(Triangle[] triangles, int cubeindex, Vector3[] vertlist){
 
