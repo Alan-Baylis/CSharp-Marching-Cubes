@@ -76,13 +76,14 @@ public class Voxel {
 		}
 		else{
 
-			float[] _densities = new float[8];
+			densities = new float[8];
 			for(int i = 0; i<corners.Length; i++){
-				_densities[i] = chunk.GetDensity(corners[i].x, corners[i].y, corners[i].z);
-				chunk.densities[(int)corners[i].x, (int)corners[i].y, (int)corners[i].z] = _densities[i];
+                float density = chunk.GetDensity(corners[i].x, corners[i].y, corners[i].z);
+                densities[i] = density;
+				chunk.densities[(int)corners[i].x, (int)corners[i].y, (int)corners[i].z] = density;
 			}
 			densitiesCreated = true;
-			return _densities;
+			return densities;
 		}
 	}
 
