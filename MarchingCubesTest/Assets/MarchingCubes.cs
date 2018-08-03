@@ -47,7 +47,7 @@ public static class MarchingCubes {
         triangle.points[2] = vertlist[LookupTables.triTable[cubeindex, i+2]];
     }
 
-    public static void GenerateVertlist(ref Vector3[] vertlist, int edgeindex, float isolevel, Vector3[] corners, float[] densities, bool interpolate){
+    public static void GenerateVertlist(ref Vector3[] vertlist, int edgeindex, float isolevel, Vector3Int[] corners, float[] densities, bool interpolate){
 
 		
 
@@ -157,10 +157,10 @@ public struct Triangle
 
 public struct GridCell
 {
-    public Vector3[] corners;
+    public Vector3Int[] corners;
     public float[] densities;
 
-    public GridCell(Vector3[] corners, float[] densities)
+    public GridCell(Vector3Int[] corners, float[] densities)
     {
         this.corners = corners;
         this.densities = densities;

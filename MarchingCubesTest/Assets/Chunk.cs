@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 public class Chunk : MonoBehaviour {
 
@@ -34,10 +35,12 @@ public class Chunk : MonoBehaviour {
     [HideInInspector]
     public int j = 0;
 
-	public float GetDensity(float x, float y, float z){
+	public float GetDensity(int x, int y, int z){
 
-		if(densitiesCreated[(int)x,(int)y,(int)z])
-			return densities[(int)x,(int)y,(int)z];
+
+
+		if(densitiesCreated[x,y,z])
+			return densities[x,y,z];
         else
 		    return CalculateDensity(x,y,z);
 
@@ -45,9 +48,9 @@ public class Chunk : MonoBehaviour {
 
 	}
 
-    public float CalculateDensity(float x, float y, float z)
+    public float CalculateDensity(int x, int y, int z)
     {
-        densitiesCreated[(int)x, (int)y, (int)z] = true;
+        densitiesCreated[x, y, z] = true;
 
         return -1 * x * y * z + 30;
     }
@@ -161,38 +164,34 @@ public class Chunk : MonoBehaviour {
 
     void UpdateMesh(){
 
+
         Vector3[] verts = new Vector3[(chunkSize - 1) * (chunkSize - 1) * (chunkSize - 1) * 3];
 
         for (int x = 0; x<chunkSize-1; x++){
 			for(int y = 0; y<chunkSize-1; y++){
 				for(int z = 0; z<chunkSize-1; z++){
 
-                    Voxel voxel;
-
                     if (!voxelsCreated)
-                    {
-                        voxel = new Voxel(x, y, z, this);
-                        voxels[x, y, z] = voxel;
-                    }
-                    else
-                        voxel = voxels[x, y, z];
+                        voxels[x, y, z] = new Voxel(x,y,z, this);
 
-					voxel.March(iso, chunkSize, interpolate, verts);
-
-
+                    voxels[x, y, z].March(iso, chunkSize, interpolate, verts);
 				}
 			}
 		}
 
+
         voxelsCreated = true;
 
-		int[] tris = new int[j];
+        Profiler.BeginSample("Updating the mesh");
 
-		for(int i = 0; i<j; i++){
+
+        int[] tris = new int[j];
+
+        for (int i = 0; i<j; i++){
 			tris[i] = i;
 		}
 
-        mesh.Clear(false);
+        Profiler.EndSample();
 
         mesh.vertices = verts;
 		mesh.triangles = tris;
@@ -204,6 +203,8 @@ public class Chunk : MonoBehaviour {
         j = 0;
 
 		GetComponent<MeshCollider>().sharedMesh = mesh;
+
+        
 
 
 	}
