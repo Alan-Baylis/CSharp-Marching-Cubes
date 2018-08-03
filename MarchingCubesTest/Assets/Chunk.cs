@@ -168,7 +168,7 @@ public class Chunk : MonoBehaviour {
 
     void UpdateMesh(){
 
-    List<Vector3> verts = new List<Vector3>();
+        List<Vector3> verts = new List<Vector3>();
 
 
         for (int x = 0; x<chunkSize-1; x++){
@@ -188,16 +188,13 @@ public class Chunk : MonoBehaviour {
 
         voxelsCreated = true;
 
-        Profiler.BeginSample("Updating the mesh");
-
-
         int[] tris = new int[j];
 
         for (int i = 0; i<j; i++){
 			tris[i] = i;
 		}
 
-        Profiler.EndSample();
+        mesh.Clear(false);
 
         mesh.SetVertices(verts);
 		mesh.triangles = tris;
