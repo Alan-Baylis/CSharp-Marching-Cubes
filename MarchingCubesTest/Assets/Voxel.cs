@@ -36,7 +36,7 @@ public class Voxel {
 
 	}
 
-	public void March(float isolevel, int chunkSize, bool interpolate, Vector3[] verts){
+	public void March(float isolevel, int chunkSize, bool interpolate, List<Vector3> verts){
 	
 		cell.corners = corners;
 		cell.densities = GenerateDensities(corners);
@@ -48,18 +48,12 @@ public class Voxel {
 
 		for(int i = 0; i<triCount; i++){
             AddVerts(verts, i);
-            
         }	
 	}
 
-    void AddVerts(Vector3[] verts, int i)
+    void AddVerts(List<Vector3> verts, int i)
     {
-        Vector3[] ps = triangles[i].points;
-        int j = chunk.j;
-
-        verts[j + 0] = ps[0];
-        verts[j + 1] = ps[1];
-        verts[j + 2] = ps[2];
+        verts.AddRange(triangles[i].points);
 
         chunk.j += 3;
 

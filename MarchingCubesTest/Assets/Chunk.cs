@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Chunk : MonoBehaviour {
@@ -11,9 +12,9 @@ public class Chunk : MonoBehaviour {
 	public MeshFilter meshFilter;
 
     [HideInInspector]
-	public Mesh mesh;
+    public Mesh mesh;
 
-	public bool interpolate;
+    public bool interpolate = true;
 
 	public float[,,] densities;
     public bool[,,] densitiesCreated;
@@ -73,10 +74,6 @@ public class Chunk : MonoBehaviour {
 		return val;
 	}
 
-	void OnValidate(){
-		// UpdateMesh();
-	}
-
 	void Awake(){
 		densities = new float[chunkSize, chunkSize, chunkSize];
         densitiesCreated = new bool[chunkSize, chunkSize, chunkSize];
@@ -86,8 +83,9 @@ public class Chunk : MonoBehaviour {
 		meshFilter = GetComponent<MeshFilter>();
 	}
 
-	// Use this for initialization
 	void Start () {
+
+        
 
 		gameObject.AddComponent<MeshCollider>();
         voxels = new Voxel[chunkSize - 1, chunkSize - 1, chunkSize - 1];
@@ -96,7 +94,7 @@ public class Chunk : MonoBehaviour {
 	}
 
 	void Update(){
-		if(Input.GetButtonDown("Fire1")){
+		if(Input.GetButton("Fire1")){
 			
 			RaycastHit hit;
        		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -112,6 +110,10 @@ public class Chunk : MonoBehaviour {
 
     void ModifyTerrain(Vector3 p, bool build, float force)
     {
+
+        if (force <= 0)
+            return;
+
 
         //Calculate modification range
         int range = Mathf.CeilToInt(force / 2f);
@@ -161,7 +163,7 @@ public class Chunk : MonoBehaviour {
 
     void UpdateMesh(){
 
-        Vector3[] verts = new Vector3[(chunkSize - 1) * (chunkSize - 1) * (chunkSize - 1) * 3];
+        List<Vector3> verts = new List<Vector3>();
 
         for (int x = 0; x<chunkSize-1; x++){
 			for(int y = 0; y<chunkSize-1; y++){
@@ -192,9 +194,9 @@ public class Chunk : MonoBehaviour {
 			tris[i] = i;
 		}
 
-        mesh.Clear(false);
+        mesh = new Mesh();
 
-        mesh.vertices = verts;
+        mesh.SetVertices(verts);
 		mesh.triangles = tris;
 
 		mesh.RecalculateNormals();
