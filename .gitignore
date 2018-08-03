@@ -18,6 +18,7 @@ db.lock
 storage.ide
 storage.ide-shm
 storage.ide-wal
+manifest.json
 
 .collabignore
 
@@ -47,3 +48,4 @@ storage.ide-wal
 Icon?
 ehthumbs.db
 Thumbs.db
+MarchingCubesTest/Packages/manifest.json
