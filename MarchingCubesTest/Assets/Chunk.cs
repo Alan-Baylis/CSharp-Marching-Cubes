@@ -99,26 +99,30 @@ public class Chunk : MonoBehaviour {
 	}
 
 	void Update(){
-		if(Input.GetButtonDown("Fire1")){
-			
-			RaycastHit hit;
-       		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        
-        	if (Physics.Raycast(ray, out hit)) {
-            	
-				Chunk chunk = hit.transform.GetComponent<Chunk>();
 
-				chunk.ModifyTerrain(hit.point, add, force);
-        	}
+		if(Input.GetButtonDown("Fire1")){
+            if (force > 0)
+            {
+
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+                if (Physics.Raycast(ray, out hit))
+                {
+
+                    Chunk chunk = hit.transform.GetComponent<Chunk>();
+
+                    chunk.ModifyTerrain(hit.point, add, force);
+                }
+            }
 		}
 	}
 
     void ModifyTerrain(Vector3 p, bool build, float force)
-    {
+    { 
 
         //Calculate modification range
         int range = Mathf.CeilToInt(force / 2f);
-
 
         int modifier;
 
@@ -164,15 +168,17 @@ public class Chunk : MonoBehaviour {
 
     void UpdateMesh(){
 
+    List<Vector3> verts = new List<Vector3>();
 
-        Vector3[] verts = new Vector3[(chunkSize - 1) * (chunkSize - 1) * (chunkSize - 1) * 3];
 
         for (int x = 0; x<chunkSize-1; x++){
 			for(int y = 0; y<chunkSize-1; y++){
 				for(int z = 0; z<chunkSize-1; z++){
 
+
                     if (!voxelsCreated)
                         voxels[x, y, z] = new Voxel(x,y,z, this);
+
 
                     voxels[x, y, z].March(iso, chunkSize, interpolate, verts);
 				}
@@ -193,7 +199,7 @@ public class Chunk : MonoBehaviour {
 
         Profiler.EndSample();
 
-        mesh.vertices = verts;
+        mesh.SetVertices(verts);
 		mesh.triangles = tris;
 
 		mesh.RecalculateNormals();

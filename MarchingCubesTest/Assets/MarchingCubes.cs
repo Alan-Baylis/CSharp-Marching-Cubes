@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Profiling;
 
 public static class MarchingCubes {
 
@@ -8,7 +9,7 @@ public static class MarchingCubes {
 
         int cubeindex = GenerateCubeindex(cell.densities, isolevel);
 
-		int edgeindex = LookupTables.edgeTable[cubeindex];
+        int edgeindex = GetEdgeIndex(cubeindex);
 
 		if(edgeindex == 0)
 			return 0;
@@ -21,13 +22,17 @@ public static class MarchingCubes {
 
 	}
 
+    public static int GetEdgeIndex(int cubeindex)
+    {
+        return LookupTables.edgeTable[cubeindex];
+    }
+
 	public static int GenerateTriangles(Triangle[] triangles, int cubeindex, Vector3[] vertlist){
 
         if (LookupTables.triTable[cubeindex, 0] == -1)
             return 0;
-
+        
         for (int i = 0; i<5; i++){
-
             if (LookupTables.triTable[cubeindex, i*3] == -1)
                 return i;
 
@@ -36,6 +41,7 @@ public static class MarchingCubes {
 
             SetTriangleVertices(triangles[i], vertlist, cubeindex, i*3);
 		}
+        
 
 		return 0;
 	}
@@ -43,8 +49,8 @@ public static class MarchingCubes {
     public static void SetTriangleVertices(Triangle triangle, Vector3[] vertlist, int cubeindex, int i)
     {
         triangle.points[0] = vertlist[LookupTables.triTable[cubeindex, i]];
-        triangle.points[1] = vertlist[LookupTables.triTable[cubeindex, i+1]];
-        triangle.points[2] = vertlist[LookupTables.triTable[cubeindex, i+2]];
+        triangle.points[1] = vertlist[LookupTables.triTable[cubeindex, i + 1]];
+        triangle.points[2] = vertlist[LookupTables.triTable[cubeindex, i + 2]];
     }
 
     public static void GenerateVertlist(ref Vector3[] vertlist, int edgeindex, float isolevel, Vector3Int[] corners, float[] densities, bool interpolate){
@@ -128,8 +134,7 @@ public static class MarchingCubes {
 
             return p;
 
-
-            //return (p1 + (0.5f - v1)*(p2 - p1) / (v2 - v1));
+            //return (p1 + (isolevel - v1)*(p2 - p1) / (v2 - v1));
 
 
 		} else {
