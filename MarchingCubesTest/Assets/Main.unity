@@ -335,7 +335,8 @@ MonoBehaviour:
   mesh: {fileID: 0}
   interpolate: 1
   iso: 0.5
-  force: 0
+  force: 5
+  range: 0
   forceOverDistance:
     serializedVersion: 2
     m_Curve:

@@ -20,9 +20,12 @@ public class Chunk : MonoBehaviour {
     public bool[,,] densitiesCreated;
 
 	[Range(0f,1f)]
-	public float iso = 0.5f;	
+	public float isolevel = 0.5f;	
 
 	public float force;
+
+    [Header("Set to 0 if you want to use default range")]
+    public int range;
 
     public AnimationCurve forceOverDistance;
 
@@ -30,29 +33,42 @@ public class Chunk : MonoBehaviour {
 
     private bool voxelsCreated = false;
 
-    public Voxel[,,] voxels;
+    //public Voxel[,,] voxels;
 
     [HideInInspector]
     public int j = 0;
 
-	public float GetDensity(int x, int y, int z){
+    public float GetDensity(int x, int y, int z)
+    {
 
+        float density = densities[x,y,z];
+        
+        if(!densitiesCreated[x,y,z])
+        {
+            densitiesCreated[x, y, z] = true;
+            density = CalculateDensity(x, y, z);
+            densities[x, y, z] = density;
+            return density;
+        }
 
-
-		if(densitiesCreated[x,y,z])
-			return densities[x,y,z];
-        else
-		    return CalculateDensity(x,y,z);
-
- 		
-
-	}
+        return density;
+    }
 
     public float CalculateDensity(int x, int y, int z)
     {
-        densitiesCreated[x, y, z] = true;
+        return PerlinNoise3D(x, y, z);
+    }
 
-        return -1 * x * y * z + 30;
+    public float PerlinNoise2D(float x, float y)
+    {
+        float _x = chunkSize / (x + 1);
+        float _y = chunkSize / (y + 1);
+
+        float val = Mathf.PerlinNoise(_x, _y);
+
+        Debug.Log(val);
+
+        return val;
     }
 
 	public float PerlinNoise3D(float x, float y, float z){
@@ -93,9 +109,20 @@ public class Chunk : MonoBehaviour {
 	void Start () {
 
 		gameObject.AddComponent<MeshCollider>();
-        voxels = new Voxel[chunkSize - 1, chunkSize - 1, chunkSize - 1];
+        //voxels = new Voxel[chunkSize - 1, chunkSize - 1, chunkSize - 1];
 
-		UpdateMesh();
+        for (int x = 0; x < chunkSize; x++)
+        {
+            for (int y = 0; y < chunkSize; y++)
+            {
+                for (int z = 0; z < chunkSize; z++)
+                {
+                    densities[x, y, z] = GetDensity(x, y, z);
+                }
+            }
+        }
+
+        UpdateMesh();
 	}
 
 	void Update(){
@@ -112,17 +139,16 @@ public class Chunk : MonoBehaviour {
 
                     Chunk chunk = hit.transform.GetComponent<Chunk>();
 
-                    chunk.ModifyTerrain(hit.point, add, force);
+                    chunk.ModifyTerrain(hit.point, add, force, range);
                 }
             }
 		}
 	}
 
-    void ModifyTerrain(Vector3 p, bool build, float force)
-    { 
-
+    void ModifyTerrain(Vector3 p, bool build, float force, int range)
+    {
         //Calculate modification range
-        int range = Mathf.CeilToInt(force / 2f);
+        int _range = (range == 0 ? Mathf.CeilToInt(force / 2f) : range);
 
         int modifier;
 
@@ -133,13 +159,14 @@ public class Chunk : MonoBehaviour {
             modifier = 1;
         else
             modifier = -1;
+
         
         //Loop through all density points in range
-        for (int x = -range; x < range; x++)
+        for (int x = -_range; x < _range; x++)
         {
-            for (int y = -range; y < range; y++)
+            for (int y = -_range; y < _range; y++)
             {
-                for (int z = -range; z < range; z++)
+                for (int z = -_range; z < _range; z++)
                 {
 
                     //Clamp inside chunk
@@ -168,47 +195,10 @@ public class Chunk : MonoBehaviour {
 
     void UpdateMesh(){
 
-        List<Vector3> verts = new List<Vector3>();
-
-
-        for (int x = 0; x<chunkSize-1; x++){
-			for(int y = 0; y<chunkSize-1; y++){
-				for(int z = 0; z<chunkSize-1; z++){
-
-
-                    if (!voxelsCreated)
-                        voxels[x, y, z] = new Voxel(x,y,z, this);
-
-
-                    voxels[x, y, z].March(iso, chunkSize, interpolate, verts);
-				}
-			}
-		}
-
-
-        voxelsCreated = true;
-
-        int[] tris = new int[j];
-
-        for (int i = 0; i<j; i++){
-			tris[i] = i;
-		}
-
-        mesh.Clear(false);
-
-        mesh.SetVertices(verts);
-		mesh.triangles = tris;
-
-		mesh.RecalculateNormals();
+        mesh = MarchingCubes.Polygonise(chunkSize, isolevel, densities, interpolate);
 
 		meshFilter.mesh = mesh;
 
-        j = 0;
-
 		GetComponent<MeshCollider>().sharedMesh = mesh;
-
-        
-
-
 	}
 }

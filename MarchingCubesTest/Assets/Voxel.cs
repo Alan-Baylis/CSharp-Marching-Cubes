@@ -1,4 +1,4 @@
-﻿using System.Collections;
+﻿/*using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Profiling;
@@ -10,11 +10,6 @@ public class Voxel
     public Triangle[] triangles;
 
     public Chunk chunk;
-
-	public Vector3Int[] corners;
-
-
-    public float[] densities;
 
     private bool cornersCreated = false;
 
@@ -33,17 +28,18 @@ public class Voxel
         this.z = z;
         this.chunk = chunk;
 
+        cell.densities = new float[8];
+        cell.corners = new Vector3Int[8];
+
         if (!cornersCreated)
             GenerateCorners();
-        densities = GenerateDensities(corners);
-
+        GenerateDensities();
     }
 
 	public void March(float isolevel, int chunkSize, bool interpolate, List<Vector3> verts){
 	
-		cell.corners = corners;
-		cell.densities = GenerateDensities(corners);
-
+		
+        GenerateDensities();
 
         if (triangles == null)
             triangles = new Triangle[5];
@@ -69,53 +65,51 @@ public class Voxel
     }
 
 
-    public float[] GenerateDensities(Vector3Int[] corners)
+    public void GenerateDensities()
     {
 
-        if (densitiesCreated)
-        {
-            for (int i = 0; i < corners.Length; i++)
+        //if (densitiesCreated)
+        //{
+            for (int i = 0; i < cell.corners.Length; i++)
             {
-                densities[i] = chunk.GetDensity(corners[i].x, corners[i].y, corners[i].z);
-                // chunk.densities[(int)corners[i].z, (int)corners[i].y, (int)corners[i].x] = densities[i];
+            Vector3Int corner = cell.corners[i];
+                cell.densities[i] = chunk.GetDensity(corner.x, corner.y, corner.z);
 
             }
-            return densities;
+        //}
+        //else
+        //{
 
-        }
-        else
-        {
-
-            float[] _densities = new float[8];
-            for (int i = 0; i < corners.Length; i++)
-            {
-                _densities[i] = chunk.GetDensity(corners[i].x, corners[i].y, corners[i].z);
-                chunk.densities[(int)corners[i].x, (int)corners[i].y, (int)corners[i].z] = _densities[i];
-            }
-            densitiesCreated = true;
-            return _densities;
-        }
+        //    cell.densities = new float[8];
+        //    for (int i = 0; i < corners.Length; i++)
+        //    {
+        //        cell.densities[i] = chunk.GetDensity(corners[i].x, corners[i].y, corners[i].z);
+        //        chunk.densities[corners[i].x, corners[i].y, corners[i].z] = cell.densities[i];
+        //    }
+        //    densitiesCreated = true;
+        //}
     }
 
 
     public void GenerateCorners()
     {
 
-        corners = new Vector3Int[8];
+        cell.corners = new Vector3Int[8];
 
 
-        corners[0] = new Vector3Int(x, y, z);
-        corners[1] = new Vector3Int(x + 1, y, z);
-        corners[2] = new Vector3Int(x + 1, y, z + 1);
-        corners[3] = new Vector3Int(x, y, z + 1);
-
-        corners[4] = new Vector3Int(x, y + 1, z);
-        corners[5] = new Vector3Int(x + 1, y + 1, z);
-        corners[6] = new Vector3Int(x + 1, y + 1, z + 1);
-        corners[7] = new Vector3Int(x, y + 1, z + 1);
+        cell.corners[0] = new Vector3Int(x, y, z);
+        cell.corners[1] = new Vector3Int(x + 1, y, z);
+        cell.corners[2] = new Vector3Int(x + 1, y, z + 1);
+        cell.corners[3] = new Vector3Int(x, y, z + 1);
+        
+        cell.corners[4] = new Vector3Int(x, y + 1, z);
+        cell.corners[5] = new Vector3Int(x + 1, y + 1, z);
+        cell.corners[6] = new Vector3Int(x + 1, y + 1, z + 1);
+        cell.corners[7] = new Vector3Int(x, y + 1, z + 1);
 
         cornersCreated = true;
 
 
     }
 }
+*/
