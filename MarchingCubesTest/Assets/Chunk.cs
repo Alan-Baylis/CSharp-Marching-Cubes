@@ -76,11 +76,11 @@ public class Chunk : MonoBehaviour {
 
 	public float PerlinNoise3D(float x, float y, float z){
 
-		float _x = chunkSize/(x+1);
-		float _y = chunkSize/(y+1);
-		float _z = chunkSize/(z+1);
+		float _x = ((x + 1) / 5f);
+        float _z = ((z + 1) / 5f);
+        float _y = ((y + 1) / 5f);
 
-		float AB = Mathf.PerlinNoise(_x, _y);
+        float AB = Mathf.PerlinNoise(_x, _y);
 		float BC = Mathf.PerlinNoise(_y, _z);
 		float AC = Mathf.PerlinNoise(_x, _z);
 
@@ -118,17 +118,12 @@ public class Chunk : MonoBehaviour {
 	void Start () {
 
 		gameObject.AddComponent<MeshCollider>();
-        //voxels = new Voxel[chunkSize - 1, chunkSize - 1, chunkSize - 1];
 
         for (int x = 0; x < chunkSize; x++)
+        for (int y = 0; y < chunkSize; y++)
+        for (int z = 0; z < chunkSize; z++)
         {
-            for (int y = 0; y < chunkSize; y++)
-            {
-                for (int z = 0; z < chunkSize; z++)
-                {
-                    densities[x, y, z] = GetDensity(x, y, z);
-                }
-            }
+            densities[x, y, z] = GetDensity(x, y, z);
         }
 
         UpdateMesh();
@@ -142,11 +137,10 @@ public class Chunk : MonoBehaviour {
         yOff = (int)pos.y;
         zOff = (int)pos.z;
 
-        if (Time.frameCount % 4 == 0)
-            UpdateMesh();
+        
 
 
-		if(Input.GetButtonDown("Fire1")){
+		if(Input.GetButton("Fire1")){
             if (force > 0)
             {
 
@@ -182,25 +176,20 @@ public class Chunk : MonoBehaviour {
         
         //Loop through all density points in range
         for (int x = -_range; x < _range; x++)
+        for (int y = -_range; y < _range; y++)
+        for (int z = -_range; z < _range; z++)
         {
-            for (int y = -_range; y < _range; y++)
-            {
-                for (int z = -_range; z < _range; z++)
-                {
+            //Clamp inside chunk
+            //Round, this is quite messy 
+            int _x = Mathf.Clamp(Mathf.RoundToInt(p.x) - x, 0, chunkSize - 1);
+            int _y = Mathf.Clamp(Mathf.RoundToInt(p.y) - y, 0, chunkSize - 1);
+            int _z = Mathf.Clamp(Mathf.RoundToInt(p.z) - z, 0, chunkSize - 1);
 
-                    //Clamp inside chunk
-                    //Round, this is quite messy 
-                    int _x = Mathf.Clamp(Mathf.RoundToInt(p.x) - x, 0, chunkSize - 1);
-                    int _y = Mathf.Clamp(Mathf.RoundToInt(p.y) - y, 0, chunkSize - 1);
-                    int _z = Mathf.Clamp(Mathf.RoundToInt(p.z) - z, 0, chunkSize - 1);
+            //Calculate distance between density's location and hitpoint
+            float distance = Vector3.Distance(new Vector3(_x, _y, _z), p);
 
-                    //Calculate distance between density's location and hitpoint
-                    float distance = Vector3.Distance(new Vector3(_x, _y, _z), p);
-
-                    //Change density depending on distance
-                    densities[_x, _y, _z] -= (force / distance * forceOverDistance.Evaluate(Map(distance, 0, force, 0, 1))) * modifier;
-                }
-            }
+            //Change density depending on distance
+            densities[_x, _y, _z] -= (force / distance * forceOverDistance.Evaluate(Map(distance, 0, force, 0, 1))) * modifier;
         }
 
         UpdateMesh();

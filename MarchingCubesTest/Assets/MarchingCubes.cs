@@ -8,41 +8,31 @@ public static class MarchingCubes {
 	public static void Polygonise(Mesh mesh, int xOff, int yOff, int zOff, int size, float isolevel, float[,,] densities, bool interpolate){
 
         List<Vector3> vertices = new List<Vector3>();
-        //List<int> triangles = new List<int>();
 
         for (int x = 0; x < size-1; x++)
+        for (int y = 0; y < size-1; y++)
+        for (int z = 0; z < size-1; z++)
         {
-            for (int y = 0; y < size-1; y++)
+            float[] cubeDensities = GetDensities(densities, x, y, z);
+
+            int cubeIndex = GenerateCubeindex(cubeDensities, isolevel);
+            
+            int edgeIndex = LookupTables.edgeTable[cubeIndex];
+
+            if (edgeIndex == 0)
+                continue;
+
+            Vector3Int[] corners = GenerateCorners(x+xOff, y+yOff, z+zOff);
+
+            Vector3[] vertexList = new Vector3[12];
+
+            GenerateVertlist(vertexList, edgeIndex, isolevel, corners, cubeDensities, interpolate);
+
+            for (int i = 0; LookupTables.triTable[cubeIndex, i] != -1; i += 3)
             {
-                for (int z = 0; z < size-1; z++)
-                {
-                    float[] cubeDensities = GetDensities(densities, x, y, z);
-
-                    int cubeIndex = GenerateCubeindex(cubeDensities, isolevel);
-                    
-                    int edgeIndex = LookupTables.edgeTable[cubeIndex];
-
-                    if (edgeIndex == 0)
-                        continue;
-
-                    Vector3Int[] corners = GenerateCorners(x+xOff, y+yOff, z+zOff);
-
-                    Vector3[] vertexList = new Vector3[12];
-
-                    GenerateVertlist(vertexList, edgeIndex, isolevel, corners, cubeDensities, interpolate);
-
-                    for (int i = 0; LookupTables.triTable[cubeIndex, i] != -1; i += 3)
-                    {
-                        vertices.Add(vertexList[LookupTables.triTable[cubeIndex, i]]);
-                        vertices.Add(vertexList[LookupTables.triTable[cubeIndex, i+1]]);
-                        vertices.Add(vertexList[LookupTables.triTable[cubeIndex, i+2]]);
-
-                        //triangles.Add(triCount++);
-                        //triangles.Add(triCount++);
-                        //triangles.Add(triCount++);
-                    }
-
-                }
+                vertices.Add(vertexList[LookupTables.triTable[cubeIndex, i]]);
+                vertices.Add(vertexList[LookupTables.triTable[cubeIndex, i+1]]);
+                vertices.Add(vertexList[LookupTables.triTable[cubeIndex, i+2]]);
             }
         }
 
@@ -99,39 +89,50 @@ public static class MarchingCubes {
 		if (EdgeIndexZero(edgeindex, 1))
 			vertlist[0] =
 				VertexInterp(isolevel,corners[0],corners[1],densities[0],densities[1], interpolate);
+
 		if (EdgeIndexZero(edgeindex, 2))
 			vertlist[1] =
 				VertexInterp(isolevel,corners[1],corners[2],densities[1],densities[2], interpolate);
+
 		if (EdgeIndexZero(edgeindex, 4))
 			vertlist[2] =
 				VertexInterp(isolevel,corners[2],corners[3],densities[2],densities[3], interpolate);
+
 		if (EdgeIndexZero(edgeindex, 8))
 			vertlist[3] =
 				VertexInterp(isolevel,corners[3],corners[0],densities[3],densities[0], interpolate);
+
 		if (EdgeIndexZero(edgeindex, 16))
 			vertlist[4] =
 				VertexInterp(isolevel,corners[4],corners[5],densities[4],densities[5], interpolate);
+
 		if (EdgeIndexZero(edgeindex, 32))
 			vertlist[5] =
 				VertexInterp(isolevel,corners[5],corners[6],densities[5],densities[6], interpolate);
+
 		if (EdgeIndexZero(edgeindex, 64))
 			vertlist[6] =
 				VertexInterp(isolevel,corners[6],corners[7],densities[6],densities[7], interpolate);
+
 		if (EdgeIndexZero(edgeindex, 128))
 			vertlist[7] =
 				VertexInterp(isolevel,corners[7],corners[4],densities[7],densities[4], interpolate);
+
 		if (EdgeIndexZero(edgeindex, 256))
 			vertlist[8] =
 				VertexInterp(isolevel,corners[0],corners[4],densities[0],densities[4], interpolate);
+
 		if (EdgeIndexZero(edgeindex, 512))
 			vertlist[9] =
 				VertexInterp(isolevel,corners[1],corners[5],densities[1],densities[5], interpolate);
+
 		if (EdgeIndexZero(edgeindex, 1024))
 			vertlist[10] =
 				VertexInterp(isolevel,corners[2],corners[6],densities[2],densities[6], interpolate);
-		if (EdgeIndexZero(edgeindex, 2048))
-			vertlist[11] =
-				VertexInterp(isolevel,corners[3],corners[7],densities[3],densities[7], interpolate);
+
+        if (EdgeIndexZero(edgeindex, 2048))
+            vertlist[11] =
+                VertexInterp(isolevel, corners[3], corners[7], densities[3], densities[7], interpolate);
 	}
 
 	public static bool EdgeIndexZero(int edgeindex, int bitwise){
