@@ -5,14 +5,10 @@ using UnityEngine.Profiling;
 
 public static class MarchingCubes {
 
-	public static Mesh Polygonise(int size, float isolevel, float[,,] densities, bool interpolate){
+	public static void Polygonise(Mesh mesh, int xOff, int yOff, int zOff, int size, float isolevel, float[,,] densities, bool interpolate){
 
         List<Vector3> vertices = new List<Vector3>();
-        List<int> triangles = new List<int>();
-
-        Mesh mesh = new Mesh();
-
-        int triCount = 0;
+        //List<int> triangles = new List<int>();
 
         for (int x = 0; x < size-1; x++)
         {
@@ -29,52 +25,61 @@ public static class MarchingCubes {
                     if (edgeIndex == 0)
                         continue;
 
-                    Vector3[] corners = GenerateCorners(x, y, z);
+                    Vector3Int[] corners = GenerateCorners(x+xOff, y+yOff, z+zOff);
 
-                    Vector3[] vertexList = GenerateVertlist(edgeIndex, isolevel, corners, cubeDensities, interpolate);
+                    Vector3[] vertexList = new Vector3[12];
 
-                    for(int i = 0; LookupTables.triTable[cubeIndex, i] != -1; i += 3)
+                    GenerateVertlist(vertexList, edgeIndex, isolevel, corners, cubeDensities, interpolate);
+
+                    for (int i = 0; LookupTables.triTable[cubeIndex, i] != -1; i += 3)
                     {
                         vertices.Add(vertexList[LookupTables.triTable[cubeIndex, i]]);
                         vertices.Add(vertexList[LookupTables.triTable[cubeIndex, i+1]]);
                         vertices.Add(vertexList[LookupTables.triTable[cubeIndex, i+2]]);
 
-                        triangles.Add(triCount++);
-                        triangles.Add(triCount++);
-                        triangles.Add(triCount++);
+                        //triangles.Add(triCount++);
+                        //triangles.Add(triCount++);
+                        //triangles.Add(triCount++);
                     }
 
                 }
             }
         }
 
+        int[] triangles = new int[vertices.Count];
+        
+        for(int i = 0; i < vertices.Count; i++)
+        {
+            triangles[i] = i;
+        }
+
+        mesh.Clear(true);
+
         mesh.SetVertices(vertices);
         mesh.SetTriangles(triangles, 0);
         mesh.RecalculateNormals();
-
-
-        return mesh;
 	}
 
-    public static Vector3[] GenerateCorners(int x, int y, int z)
+    public static Vector3Int[] GenerateCorners(int x, int y, int z)
     {
 
-        Vector3[] corners = new Vector3[8];
+        Vector3Int[] corners = new Vector3Int[8];
 
-        corners[0] = new Vector3(x, y, z);
-        corners[1] = new Vector3(x + 1, y, z);
-        corners[2] = new Vector3(x + 1, y, z + 1);
-        corners[3] = new Vector3(x, y, z + 1);
-        corners[4] = new Vector3(x, y + 1, z);
-        corners[5] = new Vector3(x + 1, y + 1, z);
-        corners[6] = new Vector3(x + 1, y + 1, z + 1);
-        corners[7] = new Vector3(x, y + 1, z + 1);
+        corners[0] = new Vector3Int(x, y, z);
+        corners[1] = new Vector3Int(x + 1, y, z);
+        corners[2] = new Vector3Int(x + 1, y, z + 1);
+        corners[3] = new Vector3Int(x, y, z + 1);
+        corners[4] = new Vector3Int(x, y + 1, z);
+        corners[5] = new Vector3Int(x + 1, y + 1, z);
+        corners[6] = new Vector3Int(x + 1, y + 1, z + 1);
+        corners[7] = new Vector3Int(x, y + 1, z + 1);
 
         return corners;
     }
 
     public static float[] GetDensities(float[,,] densities, int x, int y, int z)
     {
+
         float[] _densities = new float[8];
 
         _densities[0] = densities[x, y, z];
@@ -89,31 +94,7 @@ public static class MarchingCubes {
         return _densities;
     }
 
-	//public static void GenerateTriangles(List<int> triangles, int cubeindex, Vector3[] vertlist){
-
- //       if (LookupTables.triTable[cubeindex, 0] == -1)
- //           return;
-        
- //       for (int i = 0; i<5; i++){
- //           if (LookupTables.triTable[cubeindex, i*3] == -1)
- //               return;
-
- //           SetTriangleVertices(triangles[i], vertlist, cubeindex, i*3);
-
- //           triangles.Add(vertlist[LookupTables.triTable[cubeindex, i]]);
-	//	}
-	//}
-
-    //public static void SetTriangleVertices(Triangle triangle, Vector3[] vertlist, int cubeindex, int i)
-    //{
-    //    triangle.points[0] = vertlist[LookupTables.triTable[cubeindex, i]];
-    //    triangle.points[1] = vertlist[LookupTables.triTable[cubeindex, i + 1]];
-    //    triangle.points[2] = vertlist[LookupTables.triTable[cubeindex, i + 2]];
-    //}
-
-    public static Vector3[] GenerateVertlist(int edgeindex, float isolevel, Vector3[] corners, float[] densities, bool interpolate){
-
-        Vector3[] vertlist = new Vector3[12];
+    public static void GenerateVertlist(Vector3[] vertlist, int edgeindex, float isolevel, Vector3Int[] corners, float[] densities, bool interpolate){
 
 		if (EdgeIndexZero(edgeindex, 1))
 			vertlist[0] =
@@ -151,8 +132,6 @@ public static class MarchingCubes {
 		if (EdgeIndexZero(edgeindex, 2048))
 			vertlist[11] =
 				VertexInterp(isolevel,corners[3],corners[7],densities[3],densities[7], interpolate);
-
-        return vertlist;
 	}
 
 	public static bool EdgeIndexZero(int edgeindex, int bitwise){
@@ -183,11 +162,11 @@ public static class MarchingCubes {
             float mu;
 			Vector3 p;
 
-			if (Mathf.Abs(isolevel-v1) < 0.00001f)
+			if (FastAbs(isolevel-v1) < 0.00001f)
 				return(p1);
-			if (Mathf.Abs(isolevel-v2) < 0.00001f)
+			if (FastAbs(isolevel-v2) < 0.00001f)
 				return(p2);
-			if (Mathf.Abs(v1-v2) < 0.00001f)
+			if (FastAbs(v1-v2) < 0.00001f)
 				return(p1);
 			mu = (isolevel - v1) / (v2 - v1);
 			p.x = p1.x + mu * (p2.x - p1.x);
@@ -235,7 +214,7 @@ public static class MarchingCubes {
 //}
 
 public static class LookupTables {
-	public static int[] edgeTable = new int[] {
+	public static readonly int[] edgeTable = new int[] {
 		0x0  , 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c,
 		0x80c, 0x905, 0xa0f, 0xb06, 0xc0a, 0xd03, 0xe09, 0xf00,
 		0x190, 0x99 , 0x393, 0x29a, 0x596, 0x49f, 0x795, 0x69c,
@@ -270,7 +249,7 @@ public static class LookupTables {
 		0x70c, 0x605, 0x50f, 0x406, 0x30a, 0x203, 0x109, 0x0
 	};
 
-	public static int[,] triTable = new int[,]{
+	public static readonly int[,] triTable = new int[,]{
 		{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 		{0, 8, 3, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},
 		{0, 1, 9, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1},

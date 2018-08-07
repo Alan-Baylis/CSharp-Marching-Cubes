@@ -31,9 +31,13 @@ public class Chunk : MonoBehaviour {
 
 	public bool add = true;
 
-    private bool voxelsCreated = false;
+    public int xOff;
+    public int yOff;
+    public int zOff;
+
 
     //public Voxel[,,] voxels;
+
 
     [HideInInspector]
     public int j = 0;
@@ -46,7 +50,7 @@ public class Chunk : MonoBehaviour {
         if(!densitiesCreated[x,y,z])
         {
             densitiesCreated[x, y, z] = true;
-            density = CalculateDensity(x, y, z);
+            density = CalculateDensity(x+xOff, y+yOff, z+zOff);
             densities[x, y, z] = density;
             return density;
         }
@@ -56,6 +60,7 @@ public class Chunk : MonoBehaviour {
 
     public float CalculateDensity(int x, int y, int z)
     {
+
         return PerlinNoise3D(x, y, z);
     }
 
@@ -65,8 +70,6 @@ public class Chunk : MonoBehaviour {
         float _y = chunkSize / (y + 1);
 
         float val = Mathf.PerlinNoise(_x, _y);
-
-        Debug.Log(val);
 
         return val;
     }
@@ -92,11 +95,17 @@ public class Chunk : MonoBehaviour {
 		return val;
 	}
 
-	void OnValidate(){
-		// UpdateMesh();
-	}
+    void UpdateMesh()
+    {
 
-	void Awake(){
+        MarchingCubes.Polygonise(mesh, xOff, yOff, zOff, chunkSize, isolevel, densities, interpolate);
+
+        meshFilter.mesh = mesh;
+
+        GetComponent<MeshCollider>().sharedMesh = mesh;
+    }
+
+    void Awake(){
 		densities = new float[chunkSize, chunkSize, chunkSize];
         densitiesCreated = new bool[chunkSize, chunkSize, chunkSize];
 
@@ -126,6 +135,16 @@ public class Chunk : MonoBehaviour {
 	}
 
 	void Update(){
+
+        Vector3 pos = transform.position;
+
+        xOff = (int)pos.x;
+        yOff = (int)pos.y;
+        zOff = (int)pos.z;
+
+        if (Time.frameCount % 4 == 0)
+            UpdateMesh();
+
 
 		if(Input.GetButtonDown("Fire1")){
             if (force > 0)
@@ -191,14 +210,4 @@ public class Chunk : MonoBehaviour {
     {
         return (value - fromSource) / (toSource - fromSource) * (toTarget - fromTarget) + fromTarget;
     }
-
-
-    void UpdateMesh(){
-
-        mesh = MarchingCubes.Polygonise(chunkSize, isolevel, densities, interpolate);
-
-		meshFilter.mesh = mesh;
-
-		GetComponent<MeshCollider>().sharedMesh = mesh;
-	}
 }
