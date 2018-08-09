@@ -257,13 +257,13 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 958998671}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1, z: -10}
+  m_LocalRotation: {x: 0.14124683, y: 0, z: 0, w: 0.9899745}
+  m_LocalPosition: {x: 8, y: 7.97, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 16.24, y: 0, z: 0}
 --- !u!1 &1896126721
 GameObject:
   m_ObjectHideFlags: 0
@@ -340,7 +340,8 @@ MonoBehaviour:
   mesh: {fileID: 0}
   interpolate: 1
   iso: 0.5
-  force: 3
+  noiseScale: 0.1
+  force: 0.5
   forceOverDistance:
     serializedVersion: 2
     m_Curve:
