@@ -37,10 +37,6 @@ public class Chunk : MonoBehaviour {
     public int yOff;
     public int zOff;
 
-
-    //public Voxel[,,] voxels;
-
-
     [HideInInspector]
     public int j = 0;
 
