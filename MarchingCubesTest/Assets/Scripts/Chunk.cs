@@ -20,9 +20,11 @@ public class Chunk : MonoBehaviour {
     public bool[,,] densitiesCreated;
 
 	[Range(0f,1f)]
-	public float isolevel = 0.5f;	
+	public float isolevel = 0.5f;
 
-	public float force;
+    public float noiseScale = 0.3f;
+
+    public float force;
 
     [Header("Set to 0 if you want to use default range")]
     public int range;
@@ -61,7 +63,9 @@ public class Chunk : MonoBehaviour {
     public float CalculateDensity(int x, int y, int z)
     {
 
-        return PerlinNoise3D(x, y, z);
+        float density = Mathf.Clamp01(y - Mathf.PerlinNoise(chunkSize / (x + 1f) / noiseScale, chunkSize / (z + 1f) / noiseScale));
+
+        return density;
     }
 
     public float PerlinNoise2D(float x, float y)
