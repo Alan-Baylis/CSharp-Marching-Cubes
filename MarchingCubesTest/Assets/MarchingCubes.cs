@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Profiling;
+﻿using UnityEngine;
 
 public static class MarchingCubes {
 
@@ -118,7 +115,7 @@ public static class MarchingCubes {
 		
 		if(interpolate){
 
-            float mu;
+            /*float mu;
 			Vector3 p;
 
 			if (Mathf.Abs(isolevel-v1) < 0.00001f)
@@ -132,9 +129,9 @@ public static class MarchingCubes {
 			p.y = p1.y + mu * (p2.y - p1.y);
 			p.z = p1.z + mu * (p2.z - p1.z);
 
-            return p;
+            return p;*/
 
-            //return (p1 + (isolevel - v1)*(p2 - p1) / (v2 - v1));
+            return (p1 + (isolevel - v1)*(p2 - p1) / (v2 - v1));
 
 
 		} else {

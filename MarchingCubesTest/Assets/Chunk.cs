@@ -20,9 +20,11 @@ public class Chunk : MonoBehaviour {
     public bool[,,] densitiesCreated;
 
 	[Range(0f,1f)]
-	public float iso = 0.5f;	
+	public float iso = 0.5f;
+    
+    public float noiseScale = 0.3f;
 
-	public float force;
+    public float force;
 
     public AnimationCurve forceOverDistance;
 
@@ -39,10 +41,14 @@ public class Chunk : MonoBehaviour {
 
 
 
-		if(densitiesCreated[x,y,z])
-			return densities[x,y,z];
+        if (densitiesCreated[x, y, z])
+            return densities[x, y, z];
         else
-		    return CalculateDensity(x,y,z);
+        {
+            densitiesCreated[x, y, z] = true;
+
+            return CalculateDensity(x, y, z);
+        }
 
  		
 
@@ -50,9 +56,12 @@ public class Chunk : MonoBehaviour {
 
     public float CalculateDensity(int x, int y, int z)
     {
-        densitiesCreated[x, y, z] = true;
 
-        return -1 * x * y * z + 30;
+        
+
+        float density = Mathf.Clamp01(y - Mathf.PerlinNoise(chunkSize / (x + 1f) / noiseScale, chunkSize / (z + 1f) / noiseScale));
+
+        return density;
     }
 
 	public float PerlinNoise3D(float x, float y, float z){
@@ -100,7 +109,7 @@ public class Chunk : MonoBehaviour {
 
 	void Update(){
 
-		if(Input.GetButtonDown("Fire1")){
+		if(Input.GetButton("Fire1")){
             if (force > 0)
             {
 

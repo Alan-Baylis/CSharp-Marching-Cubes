@@ -90,7 +90,7 @@ public class Voxel
             for (int i = 0; i < corners.Length; i++)
             {
                 _densities[i] = chunk.GetDensity(corners[i].x, corners[i].y, corners[i].z);
-                chunk.densities[(int)corners[i].x, (int)corners[i].y, (int)corners[i].z] = _densities[i];
+                chunk.densities[corners[i].x, corners[i].y, corners[i].z] = _densities[i];
             }
             densitiesCreated = true;
             return _densities;
