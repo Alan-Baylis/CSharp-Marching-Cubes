@@ -276,7 +276,7 @@ GameObject:
   - component: {fileID: 1896126723}
   - component: {fileID: 1896126722}
   m_Layer: 0
-  m_Name: GameObject
+  m_Name: Chunk
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -341,7 +341,7 @@ MonoBehaviour:
   interpolate: 1
   iso: 0.5
   noiseScale: 0.1
-  force: 0.5
+  force: 0.1
   forceOverDistance:
     serializedVersion: 2
     m_Curve:
